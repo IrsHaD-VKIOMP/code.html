@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products & Barcode</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body class="bg-gray-100">
+  <header class="bg-white shadow p-4 text-center">
+    <h1 class="text-3xl font-bold text-gray-800">Products & Barcode</h1>
+    <p class="text-sm text-gray-500">Scan or search any product — find it instantly</p>
+  </header>  <main class="max-w-3xl mx-auto py-8 px-4">
+    <!-- Barcode Scanner -->
+    <section class="mb-6">
+      <h2 class="text-xl font-semibold mb-2">📷 Scan a Barcode</h2>
+      <div id="reader" style="width: 100%; max-width: 400px; margin: auto;"></div>
+    </section><!-- Search -->
+<section class="mb-6">
+  <input type="text" id="searchInput" placeholder="Search by product name or barcode" class="w-full p-3 border border-gray-300 rounded-md">
+</section>
+
+<!-- Product List -->
+<section id="productList" class="space-y-4">
+  <!-- Sample Product Card -->
+  <div class="bg-white shadow rounded-lg p-4">
+    <div class="flex items-center space-x-4">
+      <img src="https://via.placeholder.com/80" alt="Product Image" class="w-20 h-20 object-cover rounded">
+      <div>
+        <h3 class="text-lg font-semibold">Sample Product Name</h3>
+        <p class="text-sm text-gray-500">Barcode: 1234567890123</p>
+        <div class="mt-2 flex space-x-2">
+          <a href="#" target="_blank" class="text-blue-600 underline">Buy on Amazon</a>
+          <a href="#" target="_blank" class="text-yellow-600 underline">Buy on Noon</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  </main>  <script>
+    // Barcode Scanner Logic
+    function onScanSuccess(decodedText, decodedResult) {
+      document.getElementById("searchInput").value = decodedText;
+      const query = decodedText.toLowerCase();
+      document.querySelectorAll("#productList > div").forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(query) ? "block" : "none";
+      });
+      alert("✅ Scanned: " + decodedText);
+    }
+
+    function onScanFailure(error) {
+      // Ignored scan failures for now
+    }
+
+    const html5QrCode = new Html5Qrcode("reader");
+    Html5Qrcode.getCameras().then(devices => {
+      if (devices && devices.length) {
+        const cameraId = devices[0].id;
+        html5QrCode.start(
+          cameraId,
+          { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+          onScanSuccess,
+          onScanFailure
+        );
+      } else {
+        alert("❌ No cameras found.");
+      }
+    }).catch(err => {
+      alert("⚠️ Camera access error: " + err);
+    });
+
+    // Manual search filtering
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const query = this.value.toLowerCase();
+      document.querySelectorAll("#productList > div").forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(query) ? "block" : "none";
+      });
+    });
+  </script></body>
+</html>
